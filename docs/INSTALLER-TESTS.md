@@ -4,7 +4,7 @@ The installer is intentionally narrow: it changes only the primary Segoe UI Emoj
 
 ## CI coverage
 
-GitHub Actions compiles `installer/setup.iss` with the Windows runner's Inno Setup compiler, checks the pinned upstream SHA-256 and verifies that the EXE is produced. **A successful build is not proof that installation or font rendering works.**
+GitHub Actions compiles `installer/setup.iss`, checks the pinned upstream SHA-256, and runs `tests/smoke-installer.ps1` on a disposable GitHub-hosted Windows runner. The smoke test exercises real installation from a pristine `seguiemj.ttf` mapping, checks the downloaded font SHA-256 and original font integrity, runs the installer again, then uninstalls and verifies registry restoration. **This does not prove that Chrome visually renders flags after a reboot**; that part still needs one manual acceptance test.
 
 ## Manual acceptance on a disposable Windows 11 VM
 
@@ -30,4 +30,4 @@ Get-FileHash -Algorithm SHA256 "$env:WINDIR\Fonts\seguiemj.ttf"
 Get-ChildItem "$env:WINDIR\Fonts\FEWI-SegoeEmoji-*" -ErrorAction SilentlyContinue
 ```
 
-No Windows registry edits or privileged installation tests are executed on GitHub-hosted runners.
+The automated test changes the system font **only inside the ephemeral GitHub-hosted runner**, refuses execution elsewhere, and requires administrator privileges. It never runs on a developer workstation.
