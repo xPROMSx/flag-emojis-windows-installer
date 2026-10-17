@@ -29,6 +29,8 @@ Windows does not display most country flags as colorful emoji. Chrome may show l
 - **Verified downloads.** Pin the font version and validate its SHA-256 before making system changes; never execute remote scripts.
 - **No background services.** No startup processes, telemetry, or forced updates.
 
+<a id="installation"></a>
+
 ## 🚀 Installation
 
 The installer **is not yet available**. After successful validation, it will be published in [GitHub Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases).
@@ -58,3 +60,19 @@ This repository is dedicated to the **installer**, not creating new emoji glyphs
 ## 💬 Feedback
 
 Use [GitHub Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues) for bug reports and suggestions. There is no testable installer EXE yet.
+
+---
+
+## ❤️ Support development
+
+If you find this project useful, you can voluntarily [support its development](docs/SUPPORT.en.md). The project and all its features remain free and open source regardless of donations.
+
+<div align="center">
+
+**Country flags on Windows and Chrome. Simple setup, no unnecessary steps.**
+
+⭐ If you like this project, consider [giving it a Star](https://github.com/xPROMSx/flag-emojis-windows-installer). It helps others discover it.
+
+[Installation](#installation) · [Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases) · [Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues)
+
+</div>
