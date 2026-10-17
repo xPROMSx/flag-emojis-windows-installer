@@ -1,0 +1,68 @@
+name: Windows installer
+
+on:
+  pull_request:
+    paths:
+      - "installer/**"
+      - ".github/workflows/build-installer.yml"
+      - "docs/INSTALLER-TESTS.md"
+      - "README.md"
+      - "README_EN.md"
+  push:
+    branches: [main]
+    paths:
+      - "installer/**"
+      - ".github/workflows/build-installer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile Windows EXE
+    runs-on: windows-2025
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify pinned font source and build contracts
+        shell: pwsh
+        run: |
+          $script = Get-Content -LiteralPath installer/setup.iss -Raw
+          $expectedHash = '83d29681ba6cb661500dbd1282f976cd4c498dc64479ba5d7a49877f40cabd19'
+          if (-not $script.Contains($expectedHash)) { throw 'Pinned upstream SHA-256 missing' }
+          if (-not $script.Contains('releases/download/v2.3.0/')) { throw 'Expected fixed upstream release missing' }
+          if (-not $script.Contains("DefaultFont = 'seguiemj.ttf'")) { throw 'Original font mapping missing' }
+          if (-not $script.Contains('UninstallNeedRestart')) { throw 'Uninstaller restoration hook missing' }
+
+      - name: Compile using preinstalled Inno Setup
+        shell: pwsh
+        run: |
+          $candidates = @(
+            'C:\Program Files (x86)\Inno Setup 6\ISCC.exe',
+            'C:\Program Files\Inno Setup 6\ISCC.exe',
+            'C:\Program Files\Inno Setup 7\ISCC.exe',
+            'C:\Program Files (x86)\Inno Setup 7\ISCC.exe'
+          )
+          $iscc = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+          if (-not $iscc) { throw 'ISCC.exe not found on runner' }
+          & $iscc installer\setup.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup compiler failed with exit code $LASTEXITCODE" }
+          $exe = Get-ChildItem -LiteralPath dist -Filter 'FlagEmojisSetup-v*.exe' -File |
+            Select-Object -First 1
+          if (-not $exe) { throw 'Expected setup EXE not produced' }
+          if ($exe.Length -lt 500000) { throw 'Produced EXE is unexpectedly small' }
+          $hash = Get-FileHash -LiteralPath $exe.FullName -Algorithm SHA256
+          "Installer: $($exe.Name)" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+          "Size: $($exe.Length) bytes" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+          "SHA-256: `$($hash.Hash)`" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload unsigned installer for manual testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlagEmojisSetup-Windows
+          path: dist/FlagEmojisSetup-v*.exe
+          if-no-files-found: error
+          retention-days: 7
