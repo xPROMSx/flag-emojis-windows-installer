@@ -57,7 +57,7 @@ jobs:
           $hash = Get-FileHash -LiteralPath $exe.FullName -Algorithm SHA256
           "Installer: $($exe.Name)" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
           "Size: $($exe.Length) bytes" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
-          "SHA-256: `$($hash.Hash)`" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+          "SHA-256: $($hash.Hash)" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
 
       - name: Upload unsigned installer for manual testing
         uses: actions/upload-artifact@v4
