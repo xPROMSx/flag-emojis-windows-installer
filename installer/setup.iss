@@ -241,6 +241,13 @@ begin
   Result := InstalledByThisRun;
 end;
 
+procedure ReportUninstallConflict(const MessageText: String);
+begin
+  Log('Uninstall refused: ' + MessageText);
+  if not UninstallSilent then
+    MsgBox(MessageText, mbError, MB_OK);
+end;
+
 function InitializeUninstall: Boolean;
 var
   Current, Original: String;
@@ -250,23 +257,21 @@ begin
   if not RegQueryStringValue(HKLM64, OwnershipKey, 'OriginalFont', Original) or
      not IsValidPreviousFont(Original) then
   begin
-    MsgBox('The original font backup is missing. Uninstall was stopped to protect Windows.',
-      mbError, MB_OK);
+    ReportUninstallConflict('The original font backup is missing. Uninstall was stopped to protect Windows.');
     exit;
   end;
 
   if not RegQueryStringValue(HKLM64, FontRegistryKey, FontRegistryValue, Current) or
      not Same(Current, OwnedFont) then
   begin
-    MsgBox('The active Windows emoji font no longer belongs to this installer. ' +
-      'Uninstall was stopped to preserve your settings.', mbError, MB_OK);
+    ReportUninstallConflict('The active Windows emoji font no longer belongs to this installer. ' +
+      'Uninstall was stopped to preserve your settings.');
     exit;
   end;
 
   if FileExists(FontFilePath) and not ValidFont(FontFilePath) then
   begin
-    MsgBox('The installed font file has changed. Uninstall was stopped for safety.',
-      mbError, MB_OK);
+    ReportUninstallConflict('The installed font file has changed. Uninstall was stopped for safety.');
     exit;
   end;
 
