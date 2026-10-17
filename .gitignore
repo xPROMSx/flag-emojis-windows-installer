@@ -1,2 +1,5 @@
-/build
+/build/
+/dist/
+/output/
+/*.log
 /notice.txt

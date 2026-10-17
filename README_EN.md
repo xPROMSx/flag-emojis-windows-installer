@@ -1,0 +1,84 @@
+<div align="center">
+
+[Русский](README.md) · **English**
+
+<img src="assets/branding/hero.svg" width="100%" alt="Flag Emojis Windows Installer: real country flags instead of FI, RU and DE letter codes">
+
+<h1>Flag Emojis Windows Installer</h1>
+
+### Country flag emojis on Windows 11 and Chrome. No more letter codes.
+
+**One installer · Keep familiar Windows emoji · Safe rollback**
+
+![Status](https://img.shields.io/badge/status-in%20development-315D95)
+![Windows](https://img.shields.io/badge/Windows-11-0078D4?logo=windows11&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-247A65)
+
+[Installation](#installation) · [Project status](#status) · [Support development](docs/SUPPORT.en.md) · [Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues)
+
+</div>
+
+> **Work in progress.** No installer EXE has been released yet. Do not download or run files claiming to be an official release of this project.
+
+## ✨ Why this project?
+
+Windows does not display most country flags as colorful emoji. Chrome may show letter pairs such as `FI` and `DE` instead of 🇫🇮 and 🇩🇪. A modified emoji font can solve this, but installing it through Windows does not always change the primary font registration used by Chromium.
+
+**Flag Emojis Windows Installer** aims to provide an easy way to enable flag emojis and, when needed, restore the original Microsoft font, without PowerShell commands or manual registry edits.
+
+## ⚙️ Planned features
+
+- **A few clicks to install.** A single EXE, an administrator prompt, and clear feedback.
+- **Correct registration.** Check the system's `Segoe UI Emoji (TrueType)` entry and point it to the installed flag-enabled font.
+- **Original font preserved.** Never overwrite or delete Microsoft's `seguiemj.ttf`.
+- **Repeatable install and uninstall.** Detect existing state, modify only owned files, and restore previous settings.
+- **Verified downloads.** Pin the font version and validate its SHA-256 before making system changes; never execute remote scripts.
+- **No background services.** No startup processes, telemetry, or forced updates.
+
+<a id="installation"></a>
+
+## 🚀 Installation
+
+The installer **is not yet available**. After successful validation, it will be published in [GitHub Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases).
+
+The intended flow is simple: download the EXE, run it, approve the Windows prompt, and restart. Uninstall must restore the previous font selection.
+
+## <a id="status"></a>🛠️ Development status
+
+| Component | Status |
+| --- | --- |
+| Repository presentation and layout | In preparation |
+| Install and repeat installation | Not implemented |
+| Uninstall and rollback | Not implemented |
+| Automated EXE build | Not configured |
+| Windows 11 / Chrome installer testing | Not performed |
+
+The project will not be presented as ready until install, repeat install, failed downloads, uninstall, and rollback have been tested.
+
+## 📚 Technical notes
+
+The first version targets **Windows 11** and Chromium-based browsers. System-wide installation will require administrator rights and a restart.
+
+This repository is dedicated to the **installer**, not creating new emoji glyphs or building the font itself. Font provenance, usage considerations, and required copyright notices are explained in [NOTICE.md](NOTICE.md).
+
+**Code license:** [MIT](LICENSE). Rights to the font components must be considered separately from the installer license.
+
+## 💬 Feedback
+
+Use [GitHub Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues) for bug reports and suggestions. There is no testable installer EXE yet.
+
+---
+
+## ❤️ Support development
+
+If you find this project useful, you can voluntarily [support its development](docs/SUPPORT.en.md). The project and all its features remain free and open source regardless of donations.
+
+<div align="center">
+
+**Country flags on Windows and Chrome. Simple setup, no unnecessary steps.**
+
+⭐ If you like this project, consider [giving it a Star](https://github.com/xPROMSx/flag-emojis-windows-installer). It helps others discover it.
+
+[Installation](#installation) · [Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases) · [Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues)
+
+</div>
