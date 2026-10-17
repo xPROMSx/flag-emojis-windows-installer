@@ -40,6 +40,8 @@ const
   OwnershipKey = 'SOFTWARE\xPROMSx\FlagEmojisWindowsInstaller';
   FontRegistryValue = 'Segoe UI Emoji (TrueType)';
   DefaultFont = 'seguiemj.ttf';
+  LegacyFont = 'Segoe.UI.Emoji.with.Twemoji.Flags.ttf';
+  LegacySHA256V22 = '7ab80ff5093f3381bfe837b2101020ec5c3bf348cf0387fdfa5bbba6d36c2ef9';
   OwnedFont = 'FEWI-SegoeEmoji-2.3.0.ttf';
   TempFont = 'FEWI-upstream-2.3.0.ttf';
   FontUrl = 'https://github.com/Chasmical/flag-emojis-for-windows/releases/download/v2.3.0/Segoe.UI.Emoji.with.Twemoji.Flags.ttf';
@@ -49,6 +51,8 @@ var
   AlreadyInstalled: Boolean;
   FontDownloaded: Boolean;
   InstalledByThisRun: Boolean;
+  SavedOriginal: String;
+  UninstallOriginal: String;
 
 function Same(const A, B: String): Boolean;
 begin
@@ -65,6 +69,27 @@ begin
   Result := FileExists(FileName);
   if Result then
     Result := Same(GetSHA256OfFile(FileName), FontSHA256);
+end;
+
+function IsValidPreviousFont(const FontName: String): Boolean;
+var
+  Hash, Path: String;
+begin
+  Result := False;
+  Path := ExpandConstant('{fonts}\') + FontName;
+  if not FileExists(Path) then exit;
+
+  if Same(FontName, DefaultFont) then
+  begin
+    Result := True;
+    exit;
+  end;
+
+  if Same(FontName, LegacyFont) then
+  begin
+    Hash := GetSHA256OfFile(Path);
+    Result := Same(Hash, FontSHA256) or Same(Hash, LegacySHA256V22);
+  end;
 end;
 
 function CheckState: String;
@@ -88,7 +113,7 @@ begin
       exit;
     end;
 
-    if not Same(Original, DefaultFont) then
+    if not IsValidPreviousFont(Original) then
     begin
       Result := 'Unknown original font setting. Cannot safely continue.';
       exit;
@@ -110,12 +135,13 @@ begin
     exit;
   end;
 
-  if not Same(Current, DefaultFont) then
+  if not IsValidPreviousFont(Current) then
   begin
-    Result := 'A different system Emoji font is active (' + Current +
-      '). Restore it manually before installing; it will not be overwritten.';
+    Result := 'A different or unverified Segoe UI Emoji font is active (' + Current +
+      '). Only the original Windows font or verified upstream v2.2/v2.3 is supported.';
     exit;
   end;
+  SavedOriginal := Current;
 
   if FileExists(FontFilePath) then
   begin
@@ -165,7 +191,7 @@ begin
   Copied := False;
 
   try
-    if not FileCopy(ExpandConstant('{tmp}\') + TempFont, FontFilePath, True) then
+    if not CopyFile(ExpandConstant('{tmp}\') + TempFont, FontFilePath, True) then
       RaiseException('Unable to copy the font to the Windows Fonts directory.');
     Copied := True;
 
@@ -173,7 +199,7 @@ begin
       RaiseException('Font SHA-256 mismatch after copying.');
 
     // Backup must be durable before changing the primary Windows font mapping.
-    if not RegWriteStringValue(HKLM64, OwnershipKey, 'OriginalFont', DefaultFont) then
+    if not RegWriteStringValue(HKLM64, OwnershipKey, 'OriginalFont', SavedOriginal) then
       RaiseException('Unable to save the original font registry setting.');
 
     if not RegWriteStringValue(HKLM64, FontRegistryKey, FontRegistryValue, OwnedFont) then
@@ -185,7 +211,7 @@ begin
     // Only restore our own mapping and only remove our own verified file.
     if RegQueryStringValue(HKLM64, FontRegistryKey, FontRegistryValue, Current) then
       if Same(Current, OwnedFont) then
-        RegWriteStringValue(HKLM64, FontRegistryKey, FontRegistryValue, DefaultFont);
+        RegWriteStringValue(HKLM64, FontRegistryKey, FontRegistryValue, SavedOriginal);
 
     RegDeleteKeyIncludingSubkeys(HKLM64, OwnershipKey);
 
@@ -214,7 +240,7 @@ begin
   Result := False;
 
   if not RegQueryStringValue(HKLM64, OwnershipKey, 'OriginalFont', Original) or
-     not Same(Original, DefaultFont) then
+     not IsValidPreviousFont(Original) then
   begin
     MsgBox('The original font backup is missing. Uninstall was stopped to protect Windows.',
       mbError, MB_OK);
@@ -236,6 +262,7 @@ begin
     exit;
   end;
 
+  UninstallOriginal := Original;
   Result := True;
 end;
 
@@ -244,7 +271,7 @@ begin
   if CurUninstallStep <> usUninstall then exit;
 
   if not RegWriteStringValue(HKLM64, FontRegistryKey,
-      FontRegistryValue, DefaultFont) then
+      FontRegistryValue, UninstallOriginal) then
     RaiseException('Failed to restore the original Microsoft font registration.');
 
   if FileExists(FontFilePath) then

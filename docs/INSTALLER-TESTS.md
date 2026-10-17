@@ -14,9 +14,10 @@ Use a test VM or a restorable snapshot. Do **not** use an active production mach
 2. Install the EXE with elevation and internet access. Restart. Confirm Chrome displays 🇫🇮 🇷🇺 🇩🇪 and the original `C:\Windows\Fonts\seguiemj.ttf` remains unchanged.
 3. Run the same EXE again. It should detect the verified installation and avoid downloading or duplicating the font.
 4. Disconnect network on a clean snapshot and try installation. It must fail without changing the primary registry value or creating a font file.
-5. On a clean snapshot, pre-set the primary mapping to a different font. The installer must refuse to overwrite it.
-6. Uninstall using Windows Settings. Restart. Confirm the original primary mapping, font file and original Segoe UI Emoji behavior are restored.
-7. Test an altered font hash and changed primary mapping after installation. Uninstall should refuse destructive cleanup.
+5. On a clean snapshot, switch the primary mapping to a known manually installed `Segoe.UI.Emoji.with.Twemoji.Flags.ttf` from upstream v2.2.0 or v2.3.0. The EXE must preserve this prior mapping, install its own verified font, and restore the manual mapping after uninstall without deleting the manually installed file.
+6. On a clean snapshot, pre-set the primary mapping to an unknown or altered font. The installer must refuse to overwrite it.
+7. Uninstall using Windows Settings. Restart. Confirm the previous primary mapping, original font file and previous Segoe UI Emoji behavior are restored.
+8. Test an altered font hash and changed primary mapping after installation. Uninstall should refuse destructive cleanup.
 
 ### Safe verification commands
 
