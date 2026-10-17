@@ -1,14 +1,20 @@
 <div align="center">
 
-[🇷🇺 Русский](README.md) · 🇬🇧 **English**
+[Русский](README.md) · **English**
 
-<h1>FLAG EMOJIS WINDOWS INSTALLER</h1>
+<img src="assets/branding/hero.svg" width="100%" alt="Flag Emojis Windows Installer: real country flags instead of FI, RU and DE letter codes">
 
-### Country flag emojis on Windows and Chromium browsers, without manual fixes
+<h1>Flag Emojis Windows Installer</h1>
 
-**🇫🇮 🇷🇺 🇩🇪 🇺🇸 · Windows 11 · Simple setup · Safe rollback**
+### Country flag emojis on Windows 11 and Chrome. No more letter codes.
 
-[Project status](#status) · [Report an issue](https://github.com/xPROMSx/flag-emojis-windows-installer/issues) · [License](LICENSE)
+**One installer · Keep familiar Windows emoji · Safe rollback**
+
+![Status](https://img.shields.io/badge/status-in%20development-315D95)
+![Windows](https://img.shields.io/badge/Windows-11-0078D4?logo=windows11&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-247A65)
+
+[Installation](#installation) · [Project status](#status) · [Support development](docs/SUPPORT.en.md) · [Issues](https://github.com/xPROMSx/flag-emojis-windows-installer/issues)
 
 </div>
 
