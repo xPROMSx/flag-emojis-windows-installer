@@ -1,6 +1,6 @@
 <div align="center">
 
-[Русский](README.md) · **English**
+[🇷🇺 Русский](README.md) · 🇬🇧 **English** · [🇪🇬 العربية](README_AR.md) · [🇮🇷 فارسی](README_FA.md) · [🇨🇳 简体中文](README_ZH_CN.md) · [🇪🇸 Español](README_ES.md) · [🇹🇷 Türkçe](README_TR.md)
 
 <img src="assets/branding/hero.svg" width="100%" alt="Flag Emojis Windows Installer: real country flags instead of FI, RU and DE letter codes">
 
@@ -26,19 +26,25 @@ Windows does not display most country flags as colorful emoji. Chrome may show l
 ## ⚙️ Features
 
 - **A few clicks to install.** A single EXE, an administrator prompt, and clear feedback.
-- **Correct registration.** Check the system's `Segoe UI Emoji (TrueType)` entry and point it to the installed flag-enabled font.
-- **Original font preserved.** Never overwrite or delete Microsoft's `seguiemj.ttf`.
-- **Repeatable install and uninstall.** Detect existing state, modify only owned files, and restore previous settings.
-- **Verified downloads.** Pin the font version and validate its SHA-256 before making system changes; never execute remote scripts.
-- **No background services.** No startup processes, telemetry, or forced updates.
+- **Flags in browsers.** Set up Windows to display country flags in Chrome, Edge and other Chromium-based browsers.
+- **Original font preserved.** The original Windows font is never overwritten or removed.
+- **Install and remove with ease.** Run the installer again or restore your previous font settings when uninstalling.
+- **Verified download.** Download the font from its original project and check the file before installing.
+- **No background clutter.** No startup services, telemetry or forced updates.
 
 <a id="installation"></a>
 
-## 🚀 Installation
+## 🚀 Installation and removal
 
-Download `FlagEmojisSetup-v0.1.0.exe` from [GitHub Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases), run it with administrator rights, and follow the setup wizard. The installer downloads and verifies the pinned font before changing the Windows configuration.
+**Installation**
 
-**Restart Windows** after installation. To remove it, use Settings → Apps → Installed apps. The previous font mapping is restored during uninstall. See [testing and limitations](docs/INSTALLER-TESTS.md).
+1. Download `FlagEmojisSetup-vx.x.x.exe` from [GitHub Releases](https://github.com/xPROMSx/flag-emojis-windows-installer/releases).
+2. Run the file, approve the Windows administrator prompt and follow the setup instructions. The installer downloads a verified font and configures country flags automatically.
+3. **Restart Windows** to apply the changes.
+
+**Uninstallation**
+
+Open **Settings → Apps → Installed apps**, find **Flag Emojis Windows Installer**, and select **Uninstall**. The app restores your previous font settings and removes its own files without touching the original Windows font. **Restart Windows** after uninstalling.
 
 ## 📚 Technical notes
 
