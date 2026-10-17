@@ -22,7 +22,11 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.22000
 WizardStyle=modern
 OutputDir=..\dist
+#ifdef TEST_UNREACHABLE_FONT
+OutputBaseFilename=FlagEmojisSetup-UnreachableTest
+#else
 OutputBaseFilename=FlagEmojisSetup-v{#AppVersion}
+#endif
 Compression=lzma
 SolidCompression=yes
 UninstallDisplayName=Flag Emojis Windows Installer
@@ -44,7 +48,11 @@ const
   LegacySHA256V22 = '7ab80ff5093f3381bfe837b2101020ec5c3bf348cf0387fdfa5bbba6d36c2ef9';
   OwnedFont = 'FEWI-SegoeEmoji-2.3.0.ttf';
   TempFont = 'FEWI-upstream-2.3.0.ttf';
+#ifdef TEST_UNREACHABLE_FONT
+  FontUrl = 'https://127.0.0.1:9/nonexistent.ttf';
+#else
   FontUrl = 'https://github.com/Chasmical/flag-emojis-for-windows/releases/download/v2.3.0/Segoe.UI.Emoji.with.Twemoji.Flags.ttf';
+#endif
   FontSHA256 = '83d29681ba6cb661500dbd1282f976cd4c498dc64479ba5d7a49877f40cabd19';
 
 var
@@ -291,4 +299,17 @@ end;
 function UninstallNeedRestart: Boolean;
 begin
   Result := True;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+  if CurPageID <> wpFinished then exit;
+  if ActiveLanguage = 'russian' then
+    WizardForm.FinishedLabel.Caption :=
+      'Шрифт с флагами установлен. Для применения изменений перезагрузите Windows. ' +
+      'При необходимости удалить его можно через Параметры - Приложения.'
+  else
+    WizardForm.FinishedLabel.Caption :=
+      'Country flag emojis are installed. Restart Windows to apply changes. ' +
+      'You can uninstall this app later from Windows Settings - Apps.';
 end;

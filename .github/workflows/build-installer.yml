@@ -52,6 +52,9 @@ jobs:
           if (-not $iscc) { throw 'ISCC.exe not found on runner' }
           & $iscc installer\setup.iss
           if ($LASTEXITCODE -ne 0) { throw "Inno Setup compiler failed with exit code $LASTEXITCODE" }
+          # Negative download test variant: never uploaded/published.
+          & $iscc /DTEST_UNREACHABLE_FONT installer\setup.iss
+          if ($LASTEXITCODE -ne 0) { throw "Negative test installer compilation failed with exit code $LASTEXITCODE" }
           $exe = Get-ChildItem -LiteralPath dist -Filter 'FlagEmojisSetup-v*.exe' -File |
             Select-Object -First 1
           if (-not $exe) { throw 'Expected setup EXE not produced' }
@@ -73,3 +76,37 @@ jobs:
         shell: pwsh
         timeout-minutes: 9
         run: ./tests/smoke-installer.ps1
+
+  publish:
+    name: Publish v0.1.0
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: FlagEmojisSetup-Windows
+          path: dist
+      - name: Publish tested installer to GitHub Releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v0.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v0.1.0 exists; not overwriting it."
+            exit 0
+          fi
+          test -f dist/FlagEmojisSetup-v0.1.0.exe
+          (cd dist && sha256sum FlagEmojisSetup-v0.1.0.exe > SHA256SUMS.txt)
+          gh release create v0.1.0 \
+            dist/FlagEmojisSetup-v0.1.0.exe \
+            dist/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Flag Emojis Windows Installer v0.1.0" \
+            --notes-file docs/RELEASE-v0.1.0.md

@@ -4,7 +4,7 @@ The installer is intentionally narrow: it changes only the primary Segoe UI Emoj
 
 ## CI coverage
 
-GitHub Actions compiles `installer/setup.iss`, checks the pinned upstream SHA-256, and runs `tests/smoke-installer.ps1` on a disposable GitHub-hosted Windows runner. The smoke test exercises real installation from a pristine `seguiemj.ttf` mapping, checks the downloaded font SHA-256 and original font integrity, runs the installer again, then uninstalls and verifies registry restoration. **This does not prove that Chrome visually renders flags after a reboot**; that part still needs one manual acceptance test.
+GitHub Actions compiles `installer/setup.iss`, checks the pinned upstream SHA-256, and runs `tests/smoke-installer.ps1` on a disposable GitHub-hosted Windows runner. The smoke test exercises real installation from a pristine `seguiemj.ttf` mapping, checks the downloaded font SHA-256 and original font integrity, runs the installer again, verifies that altered font mappings are never overwritten or destructively removed, tests an unreachable font download, then uninstalls and verifies registry restoration. **This does not prove that Chrome visually renders flags after a reboot**; that part still needs one manual acceptance test.
 
 ## Manual acceptance on a disposable Windows 11 VM
 

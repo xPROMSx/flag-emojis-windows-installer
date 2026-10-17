@@ -60,6 +60,21 @@ Write-Host 'PASS: repeated install is idempotent'
 
 $uninstaller = Join-Path $env:ProgramFiles 'Flag Emojis Windows Installer\unins000.exe'
 Assert-Condition (Test-Path -LiteralPath $uninstaller) 'Expected uninstaller is missing'
+
+# External registry tampering must NOT cause destructive uninstallation.
+$foreign = 'foreign-font-not-installed.ttf'
+try {
+    Set-ItemProperty -LiteralPath $registry -Name 'Segoe UI Emoji (TrueType)' -Value $foreign
+    $tamperArgs = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART')
+    $tamperResult = Start-Process -FilePath $uninstaller -ArgumentList $tamperArgs -Wait -PassThru
+    Assert-Condition ((Get-ActiveFont) -eq $foreign) 'Tampered font setting was overwritten by uninstaller'
+    Assert-Condition (Test-Path -LiteralPath $ownership) 'Uninstaller destroyed ownership metadata despite conflict'
+    Assert-Condition (Test-Path -LiteralPath $installedPath) 'Uninstaller destroyed font despite conflict'
+    Write-Host 'PASS: uninstaller rejects externally changed font registration'
+} finally {
+    Set-ItemProperty -LiteralPath $registry -Name 'Segoe UI Emoji (TrueType)' -Value $installed
+}
+
 Invoke-Installer $uninstaller (Join-Path $env:RUNNER_TEMP 'flag-emojis-uninstall.log')
 Assert-Condition ((Get-ActiveFont) -eq $original) 'Original font mapping not restored'
 Assert-Condition (-not (Test-Path -LiteralPath $ownership)) 'Installer metadata remains after uninstall'
@@ -71,3 +86,25 @@ if (Test-Path -LiteralPath $installedPath) {
 }
 Write-Host 'PASS: uninstall restored pristine font configuration'
 'PASS: automated installation + repeat + rollback checks' | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+
+# Negative cases on the pristine runner after successfully verifying rollback.
+try {
+    Set-ItemProperty -LiteralPath $registry -Name 'Segoe UI Emoji (TrueType)' -Value 'foreign-font-not-installed.ttf'
+    $badFontResult = Start-Process -FilePath $setup.FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+    Assert-Condition ((Get-ActiveFont) -eq 'foreign-font-not-installed.ttf') 'Installer unexpectedly overwrote an unknown font'
+    Assert-Condition (-not (Test-Path -LiteralPath $ownership)) 'Installer added metadata on conflict'
+    Assert-Condition (-not (Test-Path -LiteralPath $installedPath)) 'Installer copied font on conflict'
+    Write-Host 'PASS: installer refuses unknown active font'
+} finally {
+    Set-ItemProperty -LiteralPath $registry -Name 'Segoe UI Emoji (TrueType)' -Value $original
+}
+
+$offlineSetup = Join-Path $PSScriptRoot '..\dist\FlagEmojisSetup-UnreachableTest.exe'
+Assert-Condition (Test-Path -LiteralPath $offlineSetup) 'Network failure test EXE is missing'
+$networkResult = Start-Process -FilePath $offlineSetup -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+Assert-Condition ((Get-ActiveFont) -eq $original) 'Failed download changed primary font registration'
+Assert-Condition (-not (Test-Path -LiteralPath $ownership)) 'Failed download wrote ownership metadata'
+Assert-Condition (-not (Test-Path -LiteralPath $installedPath)) 'Failed download copied an owned font'
+Assert-Condition ((Get-FileHash -LiteralPath $originalPath -Algorithm SHA256).Hash -eq $originalHash) 'Failed download modified Microsoft font'
+Write-Host 'PASS: unavailable font download causes no font or registry changes'
+'PASS: negative font conflict, tampered uninstall and download failure' | Add-Content -Path $env:GITHUB_STEP_SUMMARY
